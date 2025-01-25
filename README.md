@@ -363,10 +363,122 @@ for var in variables:
         dataset[column_name].hist(alpha=0.5, label=model, bins=20)
     plt.title(f"Distribution de {var} choisi par les humains et les modèles")
     plt.xlabel(var.capitalize())
+
+
     plt.ylabel("Fréquence")
     plt.legend()
     plt.show()
 ```
 
 ---
+### **Méthode Probit avec {RprobitB}**
 
+*Ce texte est une traduction en français de la page officielle disponible sur [le dépôt GitHub de {RprobitB}](https://github.com/loelschlaeger/RprobitB/blob/main/README.md).*
+
+---
+
+#### **Objectif de {RprobitB}**
+Le package **{RprobitB}** est conçu pour expliquer les choix effectués par des décideurs parmi un ensemble discret d'alternatives, en utilisant une approche bayésienne. Par exemple, il peut être utilisé pour comprendre pourquoi des touristes préfèrent un billet de train plutôt qu’un autre. Ces informations sont précieuses pour les entreprises ferroviaires, notamment pour évaluer la **disposition à payer** des clients pour des trajets plus rapides ou plus confortables.
+
+---
+
+#### **Installation**
+Le package peut être installé directement depuis **CRAN** avec la commande suivante :
+
+```r
+install.packages("RprobitB")
+```
+
+---
+
+#### **Documentation**
+La documentation complète et les vignettes sont disponibles sur le site officiel du package : [Documentation RprobitB](https://loelschlaeger.de/RprobitB/).
+
+---
+
+#### **Exemple d’utilisation**
+Dans cette étude, **{RprobitB}** a été utilisé pour analyser un dataset contenant **2929 choix** effectués par **235 individus néerlandais** confrontés à deux options de voyage en train. Les alternatives sont décrites par les variables suivantes :
+- **Prix** (en euros)
+- **Temps de trajet** (en heures)
+- **Confort** (plus faible = plus confortable)
+- **Nombre de correspondances**
+
+---
+
+#### **Ajustement du modèle Probit**
+Un modèle probit est ajusté pour expliquer les choix en fonction des variables mentionnées. La spécification du modèle est donnée par la formule suivante :
+
+```r
+form <- choice ~ price + time + change + comfort | 0
+```
+
+Dans cette formule :
+- **`choice`** est la variable cible (le choix effectué par les individus).
+- **`price`, `time`, `change`, et `comfort`** sont les variables explicatives.
+
+Le coefficient du **prix** est fixé à **-1** pour permettre une interprétation monétaire des autres coefficients.
+
+##### **Code pour ajuster le modèle**
+```r
+data <- prepare_data(form, train_choice, id = "deciderID", idc = "occasionID")
+model <- fit_model(data, scale = "price := -1")
+```
+
+---
+
+#### **Résultats estimés**
+Les coefficients estimés montrent la valorisation des individus pour chaque variable en termes monétaires :
+- **Une heure de trajet supplémentaire** : ~25 €
+- **Une correspondance supplémentaire** : ~5 €
+- **Un niveau de confort amélioré** : ~15 €
+
+Ces valeurs permettent d’évaluer la disposition à payer des utilisateurs pour des améliorations spécifiques des services.
+
+##### **Visualisation des coefficients**
+Les coefficients peuvent être visualisés pour une meilleure interprétation :
+
+```r
+plot(coef(model))
+```
+
+---
+
+#### **Simulations de parts de marché**
+Grâce au modèle probit ajusté, il est possible de simuler l’effet de changements spécifiques sur les parts de marché.
+
+1. **Augmentation du prix**
+   Une augmentation du prix de **100 € à 110 €** (toutes choses égales par ailleurs) entraîne une perte de **15 %** des clients au profit de l’option concurrente.
+
+   ```r
+   predict(
+     model,
+     data = data.frame(
+       "price_A" = c(100, 110),
+       "price_B" = c(100, 100)
+     ),
+     overview = FALSE
+   )
+   ```
+
+2. **Amélioration du confort**
+   En améliorant le confort de la classe pour compenser une augmentation de prix, on observe un **gain de 7 %** des parts de marché.
+
+   ```r
+   predict(
+     model,
+     data = data.frame(
+       "price_A" = c(100, 110),
+       "comfort_A" = c(1, 0),
+       "price_B" = c(100, 100),
+       "comfort_B" = c(1, 1)
+     ),
+     overview = FALSE
+   )
+   ```
+
+---
+
+#### **Application dans notre étude**
+Dans ce projet, la méthode probit a été utilisée pour analyser et comparer les choix humains et les décisions générées par les modèles IA (**ChatGPT**, **Gemini**, et **Mistral**). L’objectif est d’évaluer la capacité des IA à reproduire les priorités humaines et de comprendre les différences dans la valorisation des variables.
+
+Souhaitez-vous d'autres précisions ou des ajustements pour cette section ? 😊
