@@ -285,3 +285,88 @@ for index, row in dataset.iterrows():
 
 print(f"Traitement terminé. Fichier final sauvegardé dans : {output_path}")
 ```
+### **Résultats**
+
+#### **Fusion des datasets générés**
+Avant d’analyser les résultats, il est recommandé de fusionner les trois datasets générés à partir des API (**ChatGPT**, **Gemini**, et **Mistral**) en un seul dataset. Cela permet de faciliter les comparaisons et de calculer directement les correspondances entre les choix humains et ceux des modèles IA.
+
+Le fichier fusionné, nommé **`train_human_vs_ia_merged.csv`**, contient :
+- Les choix humains (**choice**) pour chaque ligne.
+- Les choix simulés par chaque IA (**ai_choice_gpt**, **ai_choice_mistral**, **ai_choice_gemini**).
+
+---
+
+#### **Code pour calculer les correspondances**
+Le code suivant calcule le pourcentage de correspondance entre les choix humains et ceux de chaque modèle IA :
+
+```python
+import pandas as pd
+
+# Charger le dataset fusionné
+file_path = r"C:\Users\amirb\Downloads\train_human_vs_ia_merged.csv"
+dataset = pd.read_csv(file_path)
+
+# Calculer les correspondances
+for model in ['ai_choice_gpt', 'ai_choice_mistral', 'ai_choice_gemini']:
+    match_percentage = (dataset['choice'] == dataset[model]).mean() * 100
+    print(f"Pourcentage de correspondance entre Humain et {model} : {match_percentage:.2f}%")
+```
+
+---
+
+#### **Résultats obtenus**
+Voici les résultats calculés à partir des données :
+
+- **Correspondance entre Humains et ai_choice_gemini :** **65.59 %**
+- **Correspondance entre Humains et ai_choice_gpt :** **65.28 %**
+- **Correspondance entre Humains et ai_choice_mistral :** **62.34 %**
+
+---
+
+### **Analyse des variables choisies**
+
+#### **Objectif**
+Ce code analyse la distribution des valeurs des variables sélectionnées (**price**, **time**, **change**, et **comfort**) par les humains et les modèles IA (**ChatGPT**, **Gemini**, et **Mistral**). L’objectif est de comparer comment chaque groupe (humains et modèles) priorise ces variables lors de la prise de décision.
+
+---
+
+#### **Code pour l'analyse des distributions**
+
+Voici le code utilisé pour analyser et visualiser les distributions des valeurs choisies :
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Charger le dataset fusionné
+file_path = r"C:\Users\amirb\Downloads\train_human_vs_ia_merged.csv"
+dataset = pd.read_csv(file_path)
+
+# Liste des variables et modèles à analyser
+variables = ['price', 'time', 'change', 'comfort']
+models = ['choice', 'ai_choice_gpt', 'ai_choice_mistral', 'ai_choice-gemini']
+
+# Ajouter des colonnes pour les variables choisies
+for var in variables:
+    for model in models:
+        column_name = f"chosen_{var}_{model}"
+        dataset[column_name] = dataset.apply(
+            lambda row: row[f"{var}_A"] if row[model] == 'A' else row[f"{var}_B"],
+            axis=1
+        )
+
+# Visualisation des distributions
+for var in variables:
+    plt.figure(figsize=(10, 6))
+    for model in models:
+        column_name = f"chosen_{var}_{model}"
+        dataset[column_name].hist(alpha=0.5, label=model, bins=20)
+    plt.title(f"Distribution de {var} choisi par les humains et les modèles")
+    plt.xlabel(var.capitalize())
+    plt.ylabel("Fréquence")
+    plt.legend()
+    plt.show()
+```
+
+---
+
