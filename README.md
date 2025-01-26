@@ -23,7 +23,7 @@ Le dataset, initialement au format .rda, a été transformé en fichier CSV pour
 
 ### **Fonctionnement des API et Explication des Paramètres**
 
-Dans cette étude, trois modèles d’intelligence artificielle (**ChatGPT**, **Gemini**, et **Mistral**) ont été utilisés pour simuler des choix humains entre deux options de billets (**A** et **B**). Chaque IA a reçu les variables des billets (prix, temps de trajet, changements, confort) sous forme de prompts clairs, et leurs réponses ont été enregistrées pour une analyse comparative avec les choix humains.
+Dans cette étude, trois modèles d’intelligence artificielle (**ChatGPT**, **Gemini**, et **Mistral**) ont été utilisés pour simuler des choix humains entre deux options de billets (**A** et **B**). Chaque IA a reçu les variables des billets (prix, temps de trajet, correspondances, confort) sous forme de prompts clairs, et leurs réponses ont été enregistrées pour une analyse comparative avec les choix humains.
 
 ---
 
@@ -54,12 +54,12 @@ Basé uniquement sur ces informations selon tes critères, quelle option choisir
 
 La température est un paramètre essentiel qui contrôle la **variabilité des réponses** d’une IA. Après plusieurs tests avec différentes valeurs, le choix de **0.7** a été retenu pour les raisons suivantes :
 
-- **Température 0 :** Produisait des réponses trop rigides et déterministes, limitant l’adaptabilité des modèles.
+- **Température 0 :** Produisait de moins bon resultats pour Gpt et Gemini.
 - **Température 1 :** Menait à des hallucinations fréquentes (comme produire des phrases complètes ou ignorer les consignes de répondre uniquement par **A** ou **B**).
 - **Température 0.7 :** Offrait un compromis idéal entre diversité et cohérence :
   - Réduisait les hallucinations.
   - Garantissait que les modèles respectaient mieux les consignes.
-  - Bien que certains modèles, comme **Mistral**, puissent mieux performer à **1**, le choix de **0.7** a permis d’uniformiser les résultats entre tous les modèles pour une meilleure cohérence globale.
+  - Bien que **Mistral** à mieux performer à **1**, le choix de **0.7** a permis d’uniformiser les résultats entre tous les modèles pour une meilleure cohérence globale.
 
 ---
 ### **Pourquoi traiter par batch ?**
@@ -328,7 +328,7 @@ Voici les résultats calculés à partir des données :
 
 ---
 
-### **Analyse des variables choisies**
+### **Analyse des variables choisies sous forme d'histogramme**
 
 Ce code analyse la distribution des valeurs des variables sélectionnées (**price**, **time**, **change**, et **comfort**) par les humains et les modèles IA (**ChatGPT**, **Gemini**, et **Mistral**). L’objectif est de comparer comment chaque groupe (humains et modèles) priorise ces variables lors de la prise de décision.
 
@@ -479,7 +479,7 @@ Grâce au modèle probit ajusté, il est possible de simuler l’effet de change
 #### **Application dans notre étude**
 Dans ce projet, la méthode probit a été utilisée pour analyser et comparer les choix humains et les décisions générées par les modèles IA (**ChatGPT**, **Gemini**, et **Mistral**). L’objectif est d’évaluer la capacité des IA à reproduire les priorités humaines et de comprendre les différences dans la valorisation des variables.
 
-## Resultat avec methode Probit
+## Résultat avec methode Probit
 ### Propension a payer
 ![9](https://github.com/user-attachments/assets/12d2139e-8da5-4fd9-ac64-316089a03f7d)
 ### **Conclusion**
@@ -492,6 +492,40 @@ Ces résultats soulignent que les IA capturent des tendances générales mais pr
 
 ---
 ### Fonction de prediction
+### Réduction des correspondances  
+Réduire le nombre de correspondances de 1 à 0 (aucune correspondance) pour compenser une augmentation du prix de 100 € à 110 € entraîne une perte modérée de 8 % des parts de marché, montrant que la réduction des correspondances n’est pas suffisante pour compenser l’effet du prix.  
+
+```r  
+predict(  
+  model,  
+  data = data.frame(  
+    "price_A" = c(100, 110),  
+    "change_A" = c(1, 0),  
+    "price_B" = c(100, 100),  
+    "change_B" = c(1, 1)  
+  ),  
+  overview = FALSE  
+)  
+```  
+
+---
+
+### Réduction du temps de trajet  
+Réduire le temps de trajet de 2.5 heures à 1.5 heure pour compenser une augmentation du prix de 100 € à 110 € entraîne un gain significatif de 23 % des parts de marché, indiquant que les utilisateurs valorisent fortement une réduction du temps de trajet.  
+
+```r  
+predict(  
+  model,  
+  data = data.frame(  
+    "price_A" = c(100, 110),  
+    "time_A" = c(2.5, 1.5),  
+    "price_B" = c(100, 100),  
+    "time_B" = c(2.5, 2.5)  
+  ),  
+  overview = FALSE  
+)  
+```  
+
 Ce tableau compare les réactions des humains et des modèles IA (**Gemini**, **GPT**, et **Mistral**) face à différents scénarios de modification des variables influençant les parts de marché.
 
 ![10](https://github.com/user-attachments/assets/43179663-ef59-42b2-b0ca-2c53dfabd815)
