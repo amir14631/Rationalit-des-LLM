@@ -3,7 +3,7 @@ library(RprobitB)
 data <- read.csv("C:/Users/amirb/Downloads/human_vs_ia_choice.csv")
 
 # Définir la formule pour analyser `ai_choice`
-form <- ai_choice_mistral ~ price + time + change + comfort | 0
+form <- ai_choice_mistral ~ price + time + change + comfort | 0       #il faut a chaque fois changer "ai_choice_mistral" selon l'ia
 data <- prepare_data(form, data, id = "deciderID", idc = "occasionID")
 model <- fit_model(data, scale = "price := -1")
 
