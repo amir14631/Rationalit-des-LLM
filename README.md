@@ -4,12 +4,17 @@ Ce projet analyse la rationalité des IA (Gemini, ChatGPT, Mistral) en comparant
 # Méthodologie
 ### Dataset
 Le dataset original, téléchargé depuis le repository GitHub de Loël Schlaeger (https://github.com/loelschlaeger/RprobitB/blob/main/data/train_choice.rda), contient des données de choix humains dans un scénario de sélection entre deux options de billets de train (A et B).
-Résumé des Variables
 
-    Prix (price_A, price_B) : Coût du billet pour chaque option (en euros).
-    Durée du trajet (time_A, time_B) : Durée totale du voyage (en heures).
-    Changements nécessaires (change_A, change_B) : Nombre de correspondances pour effectuer le trajet.
-    Niveau de confort (comfort_A, comfort_B) : (mesure inversée) Évalué sur une échelle de 2 à 0, où 0 représente le confort maximal et 2 le confort minimal.
+---
+**Prix (price_A, price_B)** : Coût du billet pour chaque option (en euros).
+
+**Durée du trajet (time_A, time_B)** : Durée totale du voyage (en heures).
+
+**Changements nécessaires (change_A, change_B)** : Nombre de correspondances pour effectuer le trajet.
+
+**Niveau de confort (comfort_A, comfort_B)** : (mesure inversée) Évalué sur une échelle de 2 à 0, où 0 représente le confort maximal et 2 le confort minimal.
+
+----
 
 Le dataset, initialement au format .rda, a été transformé en fichier CSV pour faciliter son utilisation dans des scripts Python. Cette transformation permet d’intégrer les données dans des workflows d’analyse et de simulation avec des modèles d’intelligence artificielle.
 
@@ -325,14 +330,7 @@ Voici les résultats calculés à partir des données :
 
 ### **Analyse des variables choisies**
 
-#### **Objectif**
 Ce code analyse la distribution des valeurs des variables sélectionnées (**price**, **time**, **change**, et **comfort**) par les humains et les modèles IA (**ChatGPT**, **Gemini**, et **Mistral**). L’objectif est de comparer comment chaque groupe (humains et modèles) priorise ces variables lors de la prise de décision.
-
----
-
-#### **Code pour l'analyse des distributions**
-
-Voici le code utilisé pour analyser et visualiser les distributions des valeurs choisies :
 
 ```python
 import pandas as pd
@@ -481,4 +479,29 @@ Grâce au modèle probit ajusté, il est possible de simuler l’effet de change
 #### **Application dans notre étude**
 Dans ce projet, la méthode probit a été utilisée pour analyser et comparer les choix humains et les décisions générées par les modèles IA (**ChatGPT**, **Gemini**, et **Mistral**). L’objectif est d’évaluer la capacité des IA à reproduire les priorités humaines et de comprendre les différences dans la valorisation des variables.
 
-Souhaitez-vous d'autres précisions ou des ajustements pour cette section ? 😊
+## Resultat avec methode Probit
+### Propension a payer
+![9](https://github.com/user-attachments/assets/12d2139e-8da5-4fd9-ac64-316089a03f7d)
+### **Conclusion**
+
+Gemini est le modèle le plus aligné sur les choix humains, avec des évaluations proches pour les trois variables principales (temps de trajet, nombre de correspondances, et confort).
+GPT tend à surestimer certains critères (nombre de correspondances) et sous-évaluer d'autres (confort).
+Mistral, bien que moins sensible au temps de trajet et au confort, reste assez proche pour le nombre de correspondances, mais globalement, il est le moins aligné avec les choix humains.
+
+Ces résultats soulignent que les IA capturent des tendances générales mais présentent des biais spécifiques dans leur manière de prioriser les critères.
+
+---
+### Fonction de prediction
+Ce tableau compare les réactions des humains et des modèles IA (**Gemini**, **GPT**, et **Mistral**) face à différents scénarios de modification des variables influençant les parts de marché.
+
+![10](https://github.com/user-attachments/assets/43179663-ef59-42b2-b0ca-2c53dfabd815)
+---
+
+### **Analyse globale**
+- **Sensibilité au prix** : **GPT** et **Gemini** sont plus sensibles que les humains aux variations de prix, tandis que **Mistral** est plus modéré mais reste légèrement amplifié.
+- **Importance du temps de trajet** : **GPT** et **Gemini** accordent une importance exagérée au temps, surpassant les réactions humaines, tandis que **Mistral** le sous-évalue.
+- **Réduction des correspondances** : **Gemini** est le modèle le plus aligné avec les humains, tandis que **GPT** surestime l’impact positif de ce critère.
+- **Amélioration du confort** : **GPT** et **Mistral** sous-évaluent considérablement l’importance du confort, tandis que **Gemini** reste plus proche des humains.
+
+---
+
